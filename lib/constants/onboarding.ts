@@ -1,10 +1,11 @@
-import OnBoard1 from '../assets/images/onboarding/onboarding1.svg';
-import OnBoard2 from '../assets/images/onboarding/onboarding2.svg';
-import OnBoard3 from '../assets/images/onboarding/onboarding3.svg';
+import { SvgProps } from 'react-native-svg';
+import OnBoard1 from '@/assets/images/onboard-1.svg';
+import OnBoard2 from '@/assets/images/onboard-2.svg';
+import OnBoard3 from '@/assets/images/onboard-3.svg';
 
 export interface OnBoardingSlide {
   id: string;
-  Image: React.FC<React.SVGProps<SVGSVGElement>>;
+  Image: React.FC<SvgProps>;
   title: string;
   description: string;
 }
