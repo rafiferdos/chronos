@@ -13,7 +13,6 @@ export default function OnBoardingScreen() {
   const { width } = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
 
-  // track of current slide index
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleViewableItemsChanged = useCallback(
@@ -29,12 +28,9 @@ export default function OnBoardingScreen() {
 
   const handleNext = () => {
     const nextIndex = activeIndex + 1;
-
     if (nextIndex < ONBOARDING_SLIDES.length) {
-      // Scroll smoothly to the next item
       flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
     } else {
-      // User finished onboarding -> Go to Auth
       router.replace('/(auth)/login');
     }
   };
@@ -43,17 +39,27 @@ export default function OnBoardingScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: OnBoardingSlide }) => (
-      <View style={{ width }} className="items-center justify-center px-6">
-        {/* Image Container */}
-        <View className="mb-10 h-[50%] w-full items-center justify-center">
-          <item.Image width={width * 0.85} height={width * 0.85} />
+      <View style={{ width }} className="flex-1 px-6">
+        {/* 
+         Senior Approach: 
+         - Removed hardcoded viewBox to let the SVG use its intrinsic viewBox.
+         - Used preserveAspectRatio="xMidYMid meet" to ensure the entire image is visible without cropping.
+         - Flex container ensures it takes available space.
+      */}
+        <View className="w-full flex-1 items-center justify-center py-6">
+          <item.Image
+            width="100%"
+            height="100%"
+            preserveAspectRatio="xMidYMid meet"
+            style={{ flex: 1 }}
+          />
         </View>
 
-        <View className="items-center gap-4">
+        <View className="items-center gap-4 pb-8">
           <Text className="text-center text-3xl font-bold tracking-tight text-foreground">
             {item.title}
           </Text>
-          <Text className="px-4 text-center text-lg leading-7 text-muted-foreground">
+          <Text className="px-2 text-center text-lg leading-7 text-muted-foreground">
             {item.description}
           </Text>
         </View>
@@ -65,13 +71,13 @@ export default function OnBoardingScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       {/* 1. Header Area */}
-      <View className="h-16 flex-row items-center justify-end px-6">
+      <View className="z-10 h-14 flex-row items-center justify-end px-6">
         <TouchableOpacity
           onPress={handleSkip}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           className={activeIndex === ONBOARDING_SLIDES.length - 1 ? 'opacity-0' : 'opacity-100'}
           disabled={activeIndex === ONBOARDING_SLIDES.length - 1}>
-          <Text className="text-base font-medium text-muted-foreground">Skip</Text>
+          <Text className="text-base font-semibold text-primary">Skip</Text>
         </TouchableOpacity>
       </View>
 
@@ -89,10 +95,11 @@ export default function OnBoardingScreen() {
         ref={flatListRef}
         scrollEventThrottle={32}
         className="flex-1"
+        contentContainerStyle={{ flexGrow: 1 }}
       />
 
       {/* 3. Footer Control Area */}
-      <View className="px-6 pb-8 pt-4">
+      <View className="justify-end px-6 pb-12 pt-4">
         {/* Pagination Dots */}
         <View className="mb-8 h-4 flex-row items-center justify-center gap-2">
           {ONBOARDING_SLIDES.map((_, index) => {
@@ -101,7 +108,7 @@ export default function OnBoardingScreen() {
               <View
                 key={index}
                 className={`rounded-full ${
-                  isActive ? `h-2 w-8` : `h-2 w-2 bg-muted-foreground/30`
+                  isActive ? `h-2 w-8` : `h-2 w-2 bg-muted-foreground/20`
                 }`}
                 style={isActive ? { backgroundColor: BRAND_COLOR } : {}}
               />
@@ -111,10 +118,10 @@ export default function OnBoardingScreen() {
 
         {/* Primary Action Button */}
         <Button
-          className="h-14 w-full rounded-xl shadow-sm active:opacity-90"
+          className="h-14 w-full rounded-2xl shadow-none active:opacity-90"
           style={{ backgroundColor: BRAND_COLOR }}
           onPress={handleNext}>
-          <Text className="text-lg font-semibold text-white">
+          <Text className="text-lg font-bold text-white">
             {activeIndex === ONBOARDING_SLIDES.length - 1 ? 'Get Started' : 'Next'}
           </Text>
         </Button>
