@@ -41,37 +41,38 @@ export default function OnBoardingScreen() {
 
   const handleSkip = () => router.replace('/(auth)/login');
 
-  /**
-   * SENIOR NOTE:
-   * We define the renderItem separately or inline cleanly.
-   * Notice we pass `width` explicitly to ensure each item is exactly one screen wide.
-   */
-  const renderItem = ({ item }: { item: OnBoardingSlide }) => (
-    <View style={{ width }} className="items-center px-6 pt-10">
-      {/* Image Container with fixed height to prevent layout jumps */}
-      <View className="mb-8 h-[45%] w-full items-center justify-center">
-        <item.Image width={width * 0.8} height={width * 0.8} />
-      </View>
+  const renderItem = useCallback(
+    ({ item }: { item: OnBoardingSlide }) => (
+      <View style={{ width }} className="items-center justify-center px-6">
+        {/* Image Container */}
+        <View className="mb-10 h-[50%] w-full items-center justify-center">
+          <item.Image width={width * 0.85} height={width * 0.85} />
+        </View>
 
-      <View className="gap-3">
-        <Text className="text-center text-2xl font-bold text-black">{item.title}</Text>
-        <Text className="px-4 text-center text-base leading-6 text-gray-500">
-          {item.description}
-        </Text>
+        <View className="items-center gap-4">
+          <Text className="text-center text-3xl font-bold tracking-tight text-foreground">
+            {item.title}
+          </Text>
+          <Text className="px-4 text-center text-lg leading-7 text-muted-foreground">
+            {item.description}
+          </Text>
+        </View>
       </View>
-    </View>
+    ),
+    [width]
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background">
       {/* 1. Header Area */}
-      <View className="h-16 flex-row justify-end p-5">
-        {/* Only show Skip if not on the last slide, usually better UX */}
-        {activeIndex < ONBOARDING_SLIDES.length - 1 && (
-          <TouchableOpacity onPress={handleSkip}>
-            <Text className="text-base font-medium text-gray-600">Skip</Text>
-          </TouchableOpacity>
-        )}
+      <View className="h-16 flex-row items-center justify-end px-6">
+        <TouchableOpacity
+          onPress={handleSkip}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          className={activeIndex === ONBOARDING_SLIDES.length - 1 ? 'opacity-0' : 'opacity-100'}
+          disabled={activeIndex === ONBOARDING_SLIDES.length - 1}>
+          <Text className="text-base font-medium text-muted-foreground">Skip</Text>
+        </TouchableOpacity>
       </View>
 
       {/* 2. The Carousel Engine */}
@@ -82,40 +83,38 @@ export default function OnBoardingScreen() {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        bounces={false} // Prevents overscrolling on iOS for a "cleaner" feel
+        bounces={false}
         onViewableItemsChanged={handleViewableItemsChanged}
         viewabilityConfig={viewConfig}
         ref={flatListRef}
         scrollEventThrottle={32}
+        className="flex-1"
       />
 
       {/* 3. Footer Control Area */}
       <View className="px-6 pb-8 pt-4">
-        
         {/* Pagination Dots */}
-        <View className="flex-row justify-center gap-2 mb-8 h-4 items-center">
+        <View className="mb-8 h-4 flex-row items-center justify-center gap-2">
           {ONBOARDING_SLIDES.map((_, index) => {
-             // Dynamic styling based on active state
-             const isActive = activeIndex === index;
-             return (
-               <View
-                 key={index}
-                 className={`rounded-full transition-all duration-300 ${
-                   isActive ? `w-8 h-2` : `w-2 h-2 bg-gray-300`
-                 }`}
-                 style={isActive ? { backgroundColor: BRAND_COLOR } : {}}
-               />
-             );
+            const isActive = activeIndex === index;
+            return (
+              <View
+                key={index}
+                className={`rounded-full ${
+                  isActive ? `h-2 w-8` : `h-2 w-2 bg-muted-foreground/30`
+                }`}
+                style={isActive ? { backgroundColor: BRAND_COLOR } : {}}
+              />
+            );
           })}
-
         </View>
+
         {/* Primary Action Button */}
         <Button
-          className="w-full h-14 rounded-xl shadow-none active:bg-primary/90"
-          style={{ backgroundColor: BRAND_COLOR }} 
-          onPress={handleNext}
-        >
-          <Text className="text-white font-bold text-lg">
+          className="h-14 w-full rounded-xl shadow-sm active:opacity-90"
+          style={{ backgroundColor: BRAND_COLOR }}
+          onPress={handleNext}>
+          <Text className="text-lg font-semibold text-white">
             {activeIndex === ONBOARDING_SLIDES.length - 1 ? 'Get Started' : 'Next'}
           </Text>
         </Button>
