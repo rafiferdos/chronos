@@ -1,8 +1,10 @@
+import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { ONBOARDING_SLIDES, OnBoardingSlide } from '@/lib/constants/onboarding';
 import { useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { FlatList, useWindowDimensions, View, ViewToken } from 'react-native';
+import { FlatList, TouchableOpacity, useWindowDimensions, View, ViewToken } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const BRAND_COLOR = '#5D4037';
 
@@ -58,5 +60,66 @@ export default function OnBoardingScreen() {
         </Text>
       </View>
     </View>
+  );
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      {/* 1. Header Area */}
+      <View className="h-16 flex-row justify-end p-5">
+        {/* Only show Skip if not on the last slide, usually better UX */}
+        {activeIndex < ONBOARDING_SLIDES.length - 1 && (
+          <TouchableOpacity onPress={handleSkip}>
+            <Text className="text-base font-medium text-gray-600">Skip</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* 2. The Carousel Engine */}
+      <FlatList
+        data={ONBOARDING_SLIDES}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        bounces={false} // Prevents overscrolling on iOS for a "cleaner" feel
+        onViewableItemsChanged={handleViewableItemsChanged}
+        viewabilityConfig={viewConfig}
+        ref={flatListRef}
+        scrollEventThrottle={32}
+      />
+
+      {/* 3. Footer Control Area */}
+      <View className="px-6 pb-8 pt-4">
+        
+        {/* Pagination Dots */}
+        <View className="flex-row justify-center gap-2 mb-8 h-4 items-center">
+          {ONBOARDING_SLIDES.map((_, index) => {
+             // Dynamic styling based on active state
+             const isActive = activeIndex === index;
+             return (
+               <View
+                 key={index}
+                 className={`rounded-full transition-all duration-300 ${
+                   isActive ? `w-8 h-2` : `w-2 h-2 bg-gray-300`
+                 }`}
+                 style={isActive ? { backgroundColor: BRAND_COLOR } : {}}
+               />
+             );
+          })}
+
+        </View>
+        {/* Primary Action Button */}
+        <Button
+          className="w-full h-14 rounded-xl shadow-none active:bg-primary/90"
+          style={{ backgroundColor: BRAND_COLOR }} 
+          onPress={handleNext}
+        >
+          <Text className="text-white font-bold text-lg">
+            {activeIndex === ONBOARDING_SLIDES.length - 1 ? 'Get Started' : 'Next'}
+          </Text>
+        </Button>
+      </View>
+    </SafeAreaView>
   );
 }
