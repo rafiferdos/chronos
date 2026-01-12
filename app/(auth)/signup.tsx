@@ -17,10 +17,7 @@ export default function SignUp() {
       contentContainerClassName="sm:flex-1 items-center justify-center p-4 py-8 sm:py-4 sm:p-6 mt-safe"
       keyboardDismissMode="interactive">
       <View className="w-full max-w-sm">
-        <SignUpForm
-          onSignUp={handleSignUp}
-          onSignIn={() => router.push('/(auth)/login')}
-        />
+        <SignUpForm onSignUp={handleSignUp} onSignIn={() => router.push('/(auth)/login')} />
       </View>
     </ScrollView>
   );

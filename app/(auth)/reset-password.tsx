@@ -2,30 +2,37 @@ import { AuthLayout } from '@/components/layouts/AuthLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'expo-router';
 import { Eye, EyeOff, Lock } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { Toast } from 'toastify-react-native';
+import Toast from 'react-native-toast-message';
 
 export default function ResetPassword() {
-  const router = useRouter();
   const { signIn } = useAuth();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleReset = async () => {
+    if (password.length < 6) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password too short',
+        text2: 'Must be at least 6 characters',
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
-      Toast.error('Passwords do not match', 'top');
+      Toast.show({
+        type: 'error',
+        text1: 'Passwords do not match',
+        text2: 'Please check and try again',
+      });
       return;
     }
     
-    // Mock API call simulation
-    Toast.success('Password reset successfully', 'top');
-    
-    // Auto login or redirect to home as requested
-    // We'll simulate a sign in for flow completion
+    // Auto login after password reset
     await signIn('user@example.com'); 
   };
 
@@ -64,10 +71,8 @@ export default function ResetPassword() {
           />
         </View>
 
-        <Button
-          className="h-12 rounded-xl bg-[#5D4037] active:opacity-90"
-          onPress={handleReset}>
-          <Text className="text-lg font-bold text-white">Reset Password</Text>
+        <Button onPress={handleReset}>
+          <Text className="text-lg font-bold text-primary-foreground">Reset Password</Text>
         </Button>
       </View>
     </AuthLayout>

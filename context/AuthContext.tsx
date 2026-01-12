@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Toast } from 'toastify-react-native';
+import Toast from 'react-native-toast-message';
 
 interface User {
   email: string;
@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check for persisted user session
     const loadUser = async () => {
       try {
         const storedUser = await AsyncStorage.getItem('user_session');
@@ -45,32 +44,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string) => {
     try {
       // Mock API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 800));
       
       const newUser = { email };
       setUser(newUser);
       await AsyncStorage.setItem('user_session', JSON.stringify(newUser));
       
-      Toast.success('Welcome back!', 'top');
-      router.replace('/');
+      Toast.show({
+        type: 'success',
+        text1: 'Welcome back!',
+        text2: `Signed in as ${email}`,
+      });
+      
+      router.replace('/home');
     } catch (error) {
-      Toast.error('Failed to sign in', 'top');
+      Toast.show({
+        type: 'error',
+        text1: 'Sign in failed',
+        text2: 'Please try again',
+      });
     }
   };
 
   const signUp = async (email: string) => {
     try {
       // Mock API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 800));
       
       const newUser = { email };
       setUser(newUser);
       await AsyncStorage.setItem('user_session', JSON.stringify(newUser));
       
-      Toast.success('Account created successfully!', 'top');
-      router.replace('/');
+      Toast.show({
+        type: 'success',
+        text1: 'Account created!',
+        text2: 'Welcome to Chronos',
+      });
+      
+      router.replace('/home');
     } catch (error) {
-      Toast.error('Failed to create account', 'top');
+      Toast.show({
+        type: 'error',
+        text1: 'Sign up failed',
+        text2: 'Please try again',
+      });
     }
   };
 
@@ -78,17 +95,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await AsyncStorage.removeItem('user_session');
       setUser(null);
+      
+      Toast.show({
+        type: 'success',
+        text1: 'Signed out',
+        text2: 'See you soon!',
+      });
+      
       router.replace('/(auth)/login');
-      Toast.success('Signed out successfully', 'top');
     } catch (error) {
       console.error('Sign out failed', error);
     }
   };
 
   const resetPassword = async (email: string) => {
-    // Mock password reset logic
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Usually triggers an email, here we just acknowledge
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    Toast.show({
+      type: 'success',
+      text1: 'Password reset',
+      text2: 'You can now sign in',
+    });
   };
 
   return (
