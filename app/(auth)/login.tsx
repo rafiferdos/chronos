@@ -11,7 +11,7 @@ export default function Login() {
       keyboardDismissMode="interactive">
       <View className="w-full max-w-sm">
         <SignInForm
-          onSignIn={() => router.replace('/(tabs)')}
+          onSignIn={() => router.replace('/')}
           onSignUp={() => router.push('/(auth)/signup')}
           onForgotPassword={() => router.push('/(auth)/forgot-password')}
         />
