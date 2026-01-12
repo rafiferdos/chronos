@@ -1,27 +1,21 @@
-import { View, Text } from 'react-native';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/AuthContext';
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
 
 export default function Index() {
-  const router = useRouter();
+  const { user, isLoading } = useAuth();
 
-  return (
-    <View className="flex-1 items-center justify-center bg-white gap-5">
-      <Text className="text-2xl font-bold text-gray-800">Welcome to Chronos</Text>
-      
-      <Button 
-        onPress={() => router.push('/(onboarding)/welcome')}
-        className="w-48 bg-[#5D4037]"
-      >
-        <Text className="text-white font-bold">Go to Onboarding</Text>
-      </Button>
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator size="large" color="#5D4037" />
+      </View>
+    );
+  }
 
-      <Button 
-        onPress={() => router.push('/(auth)/login')}
-        className="w-48 bg-gray-600"
-      >
-        <Text className="text-white font-bold">Go to Login</Text>
-      </Button>
-    </View>
-  );
+  if (user) {
+    return <Redirect href="/home" />;
+  }
+
+  return <Redirect href="/(onboarding)/welcome" />;
 }
