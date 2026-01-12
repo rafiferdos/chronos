@@ -64,12 +64,12 @@ export function SignUpForm({ onSignUp, onSignIn }: SignUpFormProps) {
               <Text>Continue</Text>
             </Button>
           </View>
-          <Text className="text-center text-sm">
-            Already have an account?{' '}
+          <View className="flex-row items-center justify-center gap-1">
+            <Text className="text-sm">Already have an account?</Text>
             <Pressable onPress={onSignIn}>
               <Text className="text-sm underline underline-offset-4">Sign in</Text>
             </Pressable>
-          </Text>
+          </View>
           <View className="flex-row items-center">
             <Separator className="flex-1" />
             <Text className="px-4 text-sm text-muted-foreground">or</Text>
