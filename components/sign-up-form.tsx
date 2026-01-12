@@ -1,12 +1,6 @@
 import { SocialConnections } from '@/components/social-connections';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -32,7 +26,7 @@ export function SignUpForm({ onSignUp, onSignIn }: SignUpFormProps) {
 
   return (
     <View className="gap-6">
-      <Card className="border-border/0 sm:border-border shadow-none sm:shadow-sm sm:shadow-black/5">
+      <Card className="border-border/0 shadow-none sm:border-border sm:shadow-sm sm:shadow-black/5">
         <CardHeader>
           <CardTitle className="text-center text-xl sm:text-left">Create your account</CardTitle>
           <CardDescription className="text-center sm:text-left">
@@ -78,7 +72,7 @@ export function SignUpForm({ onSignUp, onSignIn }: SignUpFormProps) {
           </Text>
           <View className="flex-row items-center">
             <Separator className="flex-1" />
-            <Text className="text-muted-foreground px-4 text-sm">or</Text>
+            <Text className="px-4 text-sm text-muted-foreground">or</Text>
             <Separator className="flex-1" />
           </View>
           <SocialConnections />
