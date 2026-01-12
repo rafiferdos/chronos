@@ -14,7 +14,12 @@ import { Text } from '@/components/ui/text';
 import * as React from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
-export function SignUpForm() {
+interface SignUpFormProps {
+  onSignUp?: () => void;
+  onSignIn?: () => void;
+}
+
+export function SignUpForm({ onSignUp, onSignIn }: SignUpFormProps) {
   const passwordInputRef = React.useRef<TextInput>(null);
 
   function onEmailSubmitEditing() {
@@ -22,7 +27,7 @@ export function SignUpForm() {
   }
 
   function onSubmit() {
-    // TODO: Submit form and navigate to protected screen if successful
+    onSignUp?.();
   }
 
   return (
@@ -67,10 +72,7 @@ export function SignUpForm() {
           </View>
           <Text className="text-center text-sm">
             Already have an account?{' '}
-            <Pressable
-              onPress={() => {
-                // TODO: Navigate to sign in screen
-              }}>
+            <Pressable onPress={onSignIn}>
               <Text className="text-sm underline underline-offset-4">Sign in</Text>
             </Pressable>
           </Text>
