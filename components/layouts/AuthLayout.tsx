@@ -20,13 +20,8 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
           contentContainerStyle={{ flexGrow: 1, padding: 24, justifyContent: 'center' }}
           showsVerticalScrollIndicator={false}
         >
-          {/* 1. Logo / Header Area */}
+          {/* 1. Header Area */}
           <View className="items-center mb-10">
-            {/* Placeholder for your Logo - You can replace Text with <Image> later */}
-            <View className="h-16 w-16 bg-[#5D4037] rounded-xl justify-center items-center mb-4">
-               <Text className="text-white font-bold text-2xl">C</Text>
-            </View>
-            
             <Text className="text-3xl font-bold text-black text-center mb-2">
               {title}
             </Text>
