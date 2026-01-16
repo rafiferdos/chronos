@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator, Modal, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator, Modal, FlatList, Alert, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Camera, User, Mail, Phone, Calendar, MapPin, Heart, AlertCircle, FileText, ChevronDown } from 'lucide-react-native';
+import { ArrowLeft, Camera, User, Mail, Phone, Calendar, MapPin, Heart, AlertCircle, FileText, ChevronDown, ImageIcon, X } from 'lucide-react-native';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/UserContext';
-import { format, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import Toast from 'react-native-toast-message';
+import * as ImagePicker from 'expo-image-picker';
 
 const RELATION_OPTIONS = ['Mother', 'Father', 'Guardian', 'Grandparent', 'Sibling', 'Caregiver', 'Other'];
 
@@ -47,6 +48,7 @@ export default function EditProfileScreen() {
   const [showRelationPicker, setShowRelationPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [showImageSourcePicker, setShowImageSourcePicker] = useState(false);
 
   // Load user data into form
   useEffect(() => {
@@ -79,6 +81,82 @@ export default function EditProfileScreen() {
     }
     return options;
   }, []);
+
+  // Request camera permissions
+  const requestCameraPermission = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Required',
+        'Camera permission is needed to take photos. Please enable it in settings.',
+        [{ text: 'OK' }]
+      );
+      return false;
+    }
+    return true;
+  };
+
+  // Request media library permissions
+  const requestMediaLibraryPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission Required',
+        'Photo library permission is needed to select images. Please enable it in settings.',
+        [{ text: 'OK' }]
+      );
+      return false;
+    }
+    return true;
+  };
+
+  // Take photo with camera
+  const takePhoto = async () => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) return;
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setAvatarUrl(result.assets[0].uri);
+        setShowImageSourcePicker(false);
+        Toast.show({ type: 'success', text1: 'Photo captured', text2: 'Your new photo has been set' });
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+      Toast.show({ type: 'error', text1: 'Camera error', text2: 'Failed to take photo' });
+    }
+  };
+
+  // Pick image from gallery
+  const pickImage = async () => {
+    const hasPermission = await requestMediaLibraryPermission();
+    if (!hasPermission) return;
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setAvatarUrl(result.assets[0].uri);
+        setShowImageSourcePicker(false);
+        Toast.show({ type: 'success', text1: 'Photo selected', text2: 'Your new photo has been set' });
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Toast.show({ type: 'error', text1: 'Gallery error', text2: 'Failed to select image' });
+    }
+  };
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -150,7 +228,7 @@ export default function EditProfileScreen() {
           <View className="items-center mb-8 mt-2">
             <TouchableOpacity 
               className="relative"
-              onPress={() => setShowAvatarPicker(true)}
+              onPress={() => setShowImageSourcePicker(true)}
             >
               <View className="w-28 h-28 rounded-full bg-gray-100 border-4 border-white shadow-lg overflow-hidden">
                 <Image 
@@ -339,6 +417,79 @@ export default function EditProfileScreen() {
 
         </ScrollView>
       </SafeAreaView>
+
+      {/* Image Source Picker Modal */}
+      <Modal visible={showImageSourcePicker} transparent animationType="fade">
+        <TouchableOpacity
+          className="flex-1 bg-black/50 justify-end"
+          activeOpacity={1}
+          onPress={() => setShowImageSourcePicker(false)}
+        >
+          <View className="bg-white rounded-t-3xl p-6 pb-10">
+            {/* Header */}
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-bold text-gray-900">Change Photo</Text>
+              <TouchableOpacity 
+                onPress={() => setShowImageSourcePicker(false)}
+                className="w-8 h-8 bg-gray-100 rounded-full items-center justify-center"
+              >
+                <X size={18} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Options */}
+            <View className="gap-3">
+              {/* Take Photo */}
+              <TouchableOpacity
+                className="flex-row items-center bg-[#F9F6F3] rounded-2xl p-4"
+                onPress={takePhoto}
+                activeOpacity={0.8}
+              >
+                <View className="w-12 h-12 bg-[#5D4037] rounded-full items-center justify-center mr-4">
+                  <Camera size={22} color="white" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-gray-900 font-semibold text-base">Take Photo</Text>
+                  <Text className="text-gray-500 text-sm">Use camera to capture a new photo</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Choose from Gallery */}
+              <TouchableOpacity
+                className="flex-row items-center bg-[#F9F6F3] rounded-2xl p-4"
+                onPress={pickImage}
+                activeOpacity={0.8}
+              >
+                <View className="w-12 h-12 bg-[#5D4037] rounded-full items-center justify-center mr-4">
+                  <ImageIcon size={22} color="white" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-gray-900 font-semibold text-base">Choose from Gallery</Text>
+                  <Text className="text-gray-500 text-sm">Select an existing photo from your device</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Choose Avatar */}
+              <TouchableOpacity
+                className="flex-row items-center bg-[#F9F6F3] rounded-2xl p-4"
+                onPress={() => {
+                  setShowImageSourcePicker(false);
+                  setShowAvatarPicker(true);
+                }}
+                activeOpacity={0.8}
+              >
+                <View className="w-12 h-12 bg-[#5D4037] rounded-full items-center justify-center mr-4">
+                  <User size={22} color="white" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-gray-900 font-semibold text-base">Choose Avatar</Text>
+                  <Text className="text-gray-500 text-sm">Pick from preset avatar images</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       {/* Relation Picker Modal */}
       <Modal visible={showRelationPicker} transparent animationType="fade">
