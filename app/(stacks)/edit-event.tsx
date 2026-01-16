@@ -68,7 +68,7 @@ export default function EditEventScreen() {
         setTitle(event.title);
         setStartDate(event.date);
         setStartTime(event.startTime);
-        setEndDate(event.date); // Using same date for end (can be extended)
+        setEndDate(event.endDate || event.date); // Use endDate if available, fallback to date for backwards compatibility
         setEndTime(event.endTime);
         setAssignedTo(event.assignedTo || '');
         setLocation(event.location || '');
@@ -125,11 +125,24 @@ export default function EditEventScreen() {
       return;
     }
 
+    // Validate end time is after start time when on same day
+    if (startDate === endDate && endTime <= startTime) {
+      Toast.show({ type: 'error', text1: 'Invalid time', text2: 'End time must be after start time' });
+      return;
+    }
+
+    // Validate end date is not before start date
+    if (endDate < startDate) {
+      Toast.show({ type: 'error', text1: 'Invalid date', text2: 'End date cannot be before start date' });
+      return;
+    }
+
     setIsLoading(true);
     try {
       await updateEvent(params.id, {
         title: title.trim(),
         date: startDate,
+        endDate,
         startTime,
         endTime,
         location: location.trim() || undefined,

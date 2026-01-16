@@ -4,7 +4,8 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 export interface CalendarEvent {
   id: string;
   title: string;
-  date: string; // YYYY-MM-DD
+  date: string; // YYYY-MM-DD (start date)
+  endDate: string; // YYYY-MM-DD (end date)
   startTime: string; // HH:mm
   endTime: string; // HH:mm
   location?: string;

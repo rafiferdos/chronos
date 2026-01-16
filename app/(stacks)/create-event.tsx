@@ -91,11 +91,24 @@ export default function CreateEventScreen() {
       return;
     }
 
+    // Validate end time is after start time when on same day
+    if (startDate === endDate && endTime <= startTime) {
+      Toast.show({ type: 'error', text1: 'Invalid time', text2: 'End time must be after start time' });
+      return;
+    }
+
+    // Validate end date is not before start date
+    if (endDate < startDate) {
+      Toast.show({ type: 'error', text1: 'Invalid date', text2: 'End date cannot be before start date' });
+      return;
+    }
+
     setIsLoading(true);
     try {
       await addEvent({
         title: title.trim(),
         date: startDate,
+        endDate,
         startTime,
         endTime,
         location: location.trim() || undefined,

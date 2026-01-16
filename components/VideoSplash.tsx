@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
+import { useEvent } from 'expo';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -19,6 +20,16 @@ const { width, height } = Dimensions.get('window');
 export function VideoSplash({ onFinish, onSkip }: VideoSplashProps) {
   const [isReady, setIsReady] = useState(false);
   const [shouldShowVideo, setShouldShowVideo] = useState<boolean | null>(null);
+  const hasFinishedRef = useRef(false);
+
+  // Create video player with expo-video
+  const player = useVideoPlayer(require('@/assets/videos/splash.mp4'), (player) => {
+    player.loop = false;
+    player.play();
+  });
+
+  // Listen for playback status changes
+  const { status } = useEvent(player, 'statusChange', { status: player.status });
 
   useEffect(() => {
     // Check if user has already completed onboarding
@@ -42,32 +53,33 @@ export function VideoSplash({ onFinish, onSkip }: VideoSplashProps) {
     checkOnboardingStatus();
   }, [onSkip]);
 
+  // Handle video status changes
+  useEffect(() => {
+    if (status === 'readyToPlay' && !isReady) {
+      setIsReady(true);
+    }
+    
+    // When video finishes playing (status becomes 'idle' after playing)
+    if (status === 'idle' && isReady && shouldShowVideo && !hasFinishedRef.current) {
+      hasFinishedRef.current = true;
+      onFinish();
+    }
+    
+    // Handle error
+    if (status === 'error' && !hasFinishedRef.current) {
+      hasFinishedRef.current = true;
+      console.log('Video splash error, proceeding to app');
+      SplashScreen.hideAsync();
+      onFinish();
+    }
+  }, [status, isReady, shouldShowVideo, onFinish]);
+
   useEffect(() => {
     // Hide the native splash screen once our video component is ready
     if (isReady && shouldShowVideo) {
       SplashScreen.hideAsync();
     }
   }, [isReady, shouldShowVideo]);
-
-  const onPlaybackStatusUpdate = useCallback((status: AVPlaybackStatus) => {
-    if (status.isLoaded) {
-      if (!isReady) {
-        setIsReady(true);
-      }
-      
-      // When video finishes playing
-      if (status.didJustFinish) {
-        onFinish();
-      }
-    }
-  }, [isReady, onFinish]);
-
-  const onError = useCallback(() => {
-    // If video fails to load, just proceed to onboarding
-    console.log('Video splash error, proceeding to app');
-    SplashScreen.hideAsync();
-    onFinish();
-  }, [onFinish]);
 
   // Still checking onboarding status
   if (shouldShowVideo === null) {
@@ -81,14 +93,11 @@ export function VideoSplash({ onFinish, onSkip }: VideoSplashProps) {
 
   return (
     <View style={styles.container}>
-      <Video
-        source={require('@/assets/videos/splash.mp4')}
+      <VideoView
+        player={player}
         style={styles.video}
-        resizeMode={ResizeMode.COVER}
-        shouldPlay
-        isLooping={false}
-        onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-        onError={onError}
+        contentFit="cover"
+        nativeControls={false}
       />
     </View>
   );
