@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Bell, Calendar, Clock, ChevronDown, AlignLeft, MapPin } from 'lucide-react-native';
+import { ArrowLeft, Bell, Calendar, Clock, ChevronDown, AlignLeft } from 'lucide-react-native';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -11,12 +11,12 @@ const REMINDER_OPTIONS = ['5 minutes before', '15 minutes before', '30 minutes b
 const REPEAT_OPTIONS = ['Daily', 'Weekly', 'Monthly', 'Annually'];
 const MEMBER_OPTIONS = ['Jenny Wilson', 'Guy Hawkins', 'Jacob Jones', 'Cody Fisher', 'Ralph Edwards'];
 
-export default function CreateEventScreen() {
+export default function EditEventScreen() {
   const router = useRouter();
   const [isMeAssigned, setIsMeAssigned] = useState(true);
-  const [reminders, setReminders] = useState(['10 minutes before', '30 minutes before', '1 hour before']);
+  const [reminders, setReminders] = useState(['5 minutes before', '5 minutes before']);
   const [showReminderIndex, setShowReminderIndex] = useState<number | null>(null);
-  const [repeatValue, setRepeatValue] = useState('Weekly');
+  const [repeatValue, setRepeatValue] = useState('Daily');
   const [showRepeat, setShowRepeat] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>(['Jenny Wilson']);
@@ -39,8 +39,7 @@ export default function CreateEventScreen() {
   return (
     <View className="flex-1 bg-white">
       <SafeAreaView edges={['top']} className="flex-1">
-        
-        {/* 1. Header */}
+        {/* Header */}
         <View className="px-5 py-2 flex-row justify-between items-center mb-4">
           <TouchableOpacity 
             onPress={() => router.back()} 
@@ -48,7 +47,7 @@ export default function CreateEventScreen() {
           >
             <ArrowLeft size={20} color="black" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-black">New Event</Text>
+          <Text className="text-xl font-bold text-black">Event</Text>
           <TouchableOpacity
             className="w-10 h-10 bg-gray-50 rounded-full justify-center items-center"
             onPress={() => router.push('/(stacks)/notifications')}
@@ -59,14 +58,14 @@ export default function CreateEventScreen() {
 
         <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
           <View className="items-center mb-6">
-            <Text className="text-xl font-bold text-black mb-1">Add New Event</Text>
+            <Text className="text-xl font-bold text-black mb-1">Edit New Event</Text>
             <Text className="text-gray-400 text-sm">Plan and organize your day easily</Text>
           </View>
 
           <View className="gap-5 pb-24">
             <View className="gap-2">
               <Text className="text-[#F87171] font-bold text-xs uppercase tracking-wide">Event Title</Text>
-              <Input placeholder="Ballet Class" className="bg-gray-50 border-gray-100 h-14" />
+              <Input defaultValue="Ballet Class" className="bg-gray-50 border-gray-100 h-14" />
             </View>
 
             <View className="gap-3">
@@ -98,12 +97,7 @@ export default function CreateEventScreen() {
             </View>
 
             <View className="gap-2">
-              <Text className="text-gray-500 font-medium text-sm">Assign to</Text>
-              <Input placeholder="Babysitter" className="bg-gray-50 border-gray-100 h-14" />
-            </View>
-
-            <View className="gap-2">
-              <Text className="text-gray-500 font-medium text-sm">Include in this event</Text>
+              <Text className="text-gray-500 font-medium text-sm">Include in Schedule</Text>
               <TouchableOpacity
                 className="flex-row items-center justify-between bg-gray-50 border border-gray-100 h-14 rounded-xl px-3"
                 onPress={() => setShowMembers((prev) => !prev)}
@@ -236,15 +230,23 @@ export default function CreateEventScreen() {
               />
             </View>
 
-            <Button 
-              className="bg-[#5D4037] h-14 rounded-2xl shadow-sm mt-2" 
-              onPress={() => router.back()}
-            >
-              <Text className="text-white font-bold text-lg">Save</Text>
-            </Button>
+            <View className="flex-row gap-3">
+              <Button 
+                className="bg-[#5D4037] h-14 rounded-2xl shadow-sm flex-1" 
+                onPress={() => router.back()}
+              >
+                <Text className="text-white font-bold text-lg">Save</Text>
+              </Button>
+              <Button
+                variant="outline"
+                className="h-14 rounded-2xl flex-1 border-gray-200"
+                onPress={() => router.back()}
+              >
+                <Text className="text-gray-600 font-bold text-lg">Cancel</Text>
+              </Button>
+            </View>
           </View>
         </ScrollView>
-
       </SafeAreaView>
     </View>
   );

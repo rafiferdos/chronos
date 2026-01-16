@@ -26,6 +26,7 @@ export default function StacksLayout() {
       <Stack.Screen name="logout" />
       <Stack.Screen name="group-members" />
       <Stack.Screen name="send-invitation" />
+      <Stack.Screen name="edit-event" />
     </Stack>
   );
 }
