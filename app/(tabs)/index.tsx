@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, Modal, FlatList, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, Modal, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react-native';
 import { useEvents } from '@/context/EventsContext';
 import { useUser } from '@/context/UserContext';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, startOfWeek, addDays } from 'date-fns';
-import Animated, { FadeIn, FadeOut, SlideInRight, SlideOutLeft, Layout } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 type ViewMode = 'year' | 'month' | 'week' | 'day' | 'schedule';
 
@@ -19,8 +19,6 @@ const VIEW_TABS: { id: ViewMode; label: string }[] = [
 ];
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -143,8 +141,7 @@ export default function HomeScreen() {
 
     return (
       <Animated.View 
-        entering={FadeIn.duration(300)} 
-        exiting={FadeOut.duration(200)}
+        entering={FadeIn.duration(200)}
         className="flex-1 px-2"
       >
         {/* Weekday headers */}
@@ -224,66 +221,66 @@ export default function HomeScreen() {
       const monthStr = `${year}-${String(month).padStart(2, '0')}`;
       const monthEvents = events.filter(e => e.date.startsWith(monthStr));
       const colors = new Set(monthEvents.map(e => e.color || 'default'));
-      return Array.from(colors).slice(0, 4); // Max 4 color indicators
+      return Array.from(colors).slice(0, 4);
     };
 
     return (
-      <Animated.ScrollView 
-        entering={FadeIn.duration(300)} 
-        exiting={FadeOut.duration(200)}
+      <ScrollView 
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-row flex-wrap py-2">
-          {months.map((month) => {
+          {months.map((month, index) => {
             const monthDate = new Date(currentYear, month, 1);
             const monthEventColors = getMonthEventColors(currentYear, month + 1);
             const hasEvents = monthEventColors.length > 0;
             
             return (
-              <AnimatedPressable
+              <Animated.View
                 key={month}
-                entering={FadeIn.delay(month * 50)}
+                entering={FadeInDown.delay(index * 30).duration(200)}
                 className="w-1/3 p-2"
-                onPress={() => {
-                  setCurrentDate(monthDate);
-                  setViewMode('month');
-                }}
               >
-                <View className={`rounded-xl p-4 items-center ${hasEvents ? 'bg-[#F9F6F3] border border-[#E8DDD4]' : 'bg-gray-50'}`}>
-                  <Text className={`font-semibold text-base ${hasEvents ? 'text-[#5D4037]' : 'text-gray-800'}`}>
-                    {format(monthDate, 'MMM')}
-                  </Text>
-                  {hasEvents && (
-                    <View className="flex-row gap-1 mt-2">
-                      {monthEventColors.map((color, idx) => (
-                        <View 
-                          key={idx}
-                          className={`w-2 h-2 rounded-full ${
-                            color === 'red' ? 'bg-red-400' :
-                            color === 'blue' ? 'bg-blue-400' :
-                            color === 'green' ? 'bg-green-400' :
-                            color === 'purple' ? 'bg-purple-400' :
-                            'bg-[#5D4037]'
-                          }`}
-                        />
-                      ))}
-                    </View>
-                  )}
-                </View>
-              </AnimatedPressable>
+                <TouchableOpacity
+                  onPress={() => {
+                    setCurrentDate(monthDate);
+                    setViewMode('month');
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View className={`rounded-xl p-4 items-center ${hasEvents ? 'bg-[#F9F6F3] border border-[#E8DDD4]' : 'bg-gray-50'}`}>
+                    <Text className={`font-semibold text-base ${hasEvents ? 'text-[#5D4037]' : 'text-gray-800'}`}>
+                      {format(monthDate, 'MMM')}
+                    </Text>
+                    {hasEvents && (
+                      <View className="flex-row gap-1 mt-2">
+                        {monthEventColors.map((color, idx) => (
+                          <View 
+                            key={idx}
+                            className={`w-2 h-2 rounded-full ${
+                              color === 'red' ? 'bg-red-400' :
+                              color === 'blue' ? 'bg-blue-400' :
+                              color === 'green' ? 'bg-green-400' :
+                              color === 'purple' ? 'bg-purple-400' :
+                              'bg-[#5D4037]'
+                            }`}
+                          />
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
             );
           })}
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
     );
   };
 
   const renderWeekView = () => {
     return (
-      <Animated.ScrollView 
-        entering={FadeIn.duration(300)} 
-        exiting={FadeOut.duration(200)}
+      <ScrollView 
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
@@ -295,12 +292,12 @@ export default function HomeScreen() {
           return (
             <Animated.View 
               key={dateString}
-              entering={FadeIn.delay(index * 50)}
-              layout={Layout.springify()}
+              entering={FadeInDown.delay(index * 40).duration(200)}
             >
               <TouchableOpacity
                 className="flex-row border-b border-gray-100 py-4"
                 onPress={() => handleDayPress(day)}
+                activeOpacity={0.7}
               >
                 <View className={`w-14 h-14 rounded-2xl items-center justify-center mr-4 ${isCurrentDay ? 'bg-[#5D4037]' : 'bg-gray-100'}`}>
                   <Text className={`text-lg font-bold ${isCurrentDay ? 'text-white' : 'text-gray-800'}`}>
@@ -326,7 +323,8 @@ export default function HomeScreen() {
             </Animated.View>
           );
         })}
-      </Animated.ScrollView>
+        <View className="h-20" />
+      </ScrollView>
     );
   };
 
@@ -336,14 +334,12 @@ export default function HomeScreen() {
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     return (
-      <Animated.ScrollView 
-        entering={FadeIn.duration(300)} 
-        exiting={FadeOut.duration(200)}
+      <ScrollView 
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
         <Animated.View 
-          entering={FadeIn.delay(100)}
+          entering={FadeIn.duration(200)}
           className="items-center py-6 border-b border-gray-100 mb-4"
         >
           <Text className="text-3xl font-bold text-gray-800">{format(currentDate, 'EEEE')}</Text>
@@ -360,7 +356,7 @@ export default function HomeScreen() {
           return (
             <Animated.View 
               key={hour} 
-              entering={FadeIn.delay(index * 20)}
+              entering={FadeIn.delay(index * 10).duration(150)}
               className="flex-row border-b border-gray-50 min-h-[70px]"
             >
               <Text className="w-16 text-xs text-gray-400 py-3 font-medium">{hourStr}</Text>
@@ -375,6 +371,7 @@ export default function HomeScreen() {
                       'bg-[#5D4037]'
                     }`}
                     onPress={() => handleDayPress(currentDate)}
+                    activeOpacity={0.8}
                   >
                     <Text className="text-white font-semibold">{event.title}</Text>
                     <Text className="text-white/80 text-xs mt-1">{event.startTime} - {event.endTime}</Text>
@@ -385,7 +382,7 @@ export default function HomeScreen() {
           );
         })}
         <View className="h-20" />
-      </Animated.ScrollView>
+      </ScrollView>
     );
   };
 
@@ -395,70 +392,64 @@ export default function HomeScreen() {
     for (let i = 0; i < 30; i++) {
       const day = addDays(currentDate, i);
       const dayStr = format(day, 'yyyy-MM-dd');
-      const events = getEventsByDate(dayStr);
-      if (events.length > 0) {
-        upcomingEvents.push({ date: day, events });
+      const dayEvts = getEventsByDate(dayStr);
+      if (dayEvts.length > 0) {
+        upcomingEvents.push({ date: day, events: dayEvts });
       }
     }
 
     return (
-      <Animated.ScrollView 
-        entering={FadeIn.duration(300)} 
-        exiting={FadeOut.duration(200)}
+      <ScrollView 
         className="flex-1 px-4"
         showsVerticalScrollIndicator={false}
       >
         {upcomingEvents.length > 0 ? (
-          upcomingEvents.map(({ date, events }, groupIndex) => (
+          upcomingEvents.map(({ date, events: evts }, groupIndex) => (
             <Animated.View 
               key={format(date, 'yyyy-MM-dd')} 
-              entering={FadeIn.delay(groupIndex * 100)}
+              entering={FadeInDown.delay(groupIndex * 50).duration(200)}
               className="mb-6"
             >
               <Text className="text-gray-500 font-semibold text-xs uppercase tracking-wider mb-3">
                 {isToday(date) ? 'Today' : format(date, 'EEEE, MMMM d')}
               </Text>
-              {events.map((event, eventIndex) => (
-                <Animated.View
+              {evts.map((event) => (
+                <TouchableOpacity
                   key={event.id}
-                  entering={FadeIn.delay(groupIndex * 100 + eventIndex * 50)}
+                  className="bg-white border border-gray-100 rounded-2xl p-4 mb-3 shadow-sm"
+                  onPress={() => handleDayPress(date)}
+                  activeOpacity={0.8}
                 >
-                  <TouchableOpacity
-                    className="bg-white border border-gray-100 rounded-2xl p-4 mb-3 shadow-sm"
-                    onPress={() => handleDayPress(date)}
-                    activeOpacity={0.8}
-                  >
-                    <View className="flex-row items-center justify-between">
-                      <View className="flex-1">
-                        <Text className="font-bold text-gray-800 text-base">{event.title}</Text>
-                        {event.location && (
-                          <Text className="text-gray-500 text-sm mt-1">{event.location}</Text>
-                        )}
-                      </View>
-                      <View className={`px-3 py-1.5 rounded-full ml-3 ${
-                        event.color === 'red' ? 'bg-red-100' :
-                        event.color === 'blue' ? 'bg-blue-100' :
-                        event.color === 'green' ? 'bg-green-100' :
-                        'bg-purple-100'
-                      }`}>
-                        <Text className={`text-xs font-semibold ${
-                          event.color === 'red' ? 'text-red-600' :
-                          event.color === 'blue' ? 'text-blue-600' :
-                          event.color === 'green' ? 'text-green-600' :
-                          'text-purple-600'
-                        }`}>
-                          {event.startTime}
-                        </Text>
-                      </View>
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-1">
+                      <Text className="font-bold text-gray-800 text-base">{event.title}</Text>
+                      {event.location && (
+                        <Text className="text-gray-500 text-sm mt-1">{event.location}</Text>
+                      )}
                     </View>
-                  </TouchableOpacity>
-                </Animated.View>
+                    <View className={`px-3 py-1.5 rounded-full ml-3 ${
+                      event.color === 'red' ? 'bg-red-100' :
+                      event.color === 'blue' ? 'bg-blue-100' :
+                      event.color === 'green' ? 'bg-green-100' :
+                      'bg-purple-100'
+                    }`}>
+                      <Text className={`text-xs font-semibold ${
+                        event.color === 'red' ? 'text-red-600' :
+                        event.color === 'blue' ? 'text-blue-600' :
+                        event.color === 'green' ? 'text-green-600' :
+                        'text-purple-600'
+                      }`}>
+                        {event.startTime}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
               ))}
             </Animated.View>
           ))
         ) : (
           <Animated.View 
-            entering={FadeIn.delay(200)}
+            entering={FadeIn.delay(100).duration(200)}
             className="items-center justify-center py-20"
           >
             <Text className="text-gray-400 text-lg text-center">No upcoming events</Text>
@@ -466,7 +457,7 @@ export default function HomeScreen() {
           </Animated.View>
         )}
         <View className="h-20" />
-      </Animated.ScrollView>
+      </ScrollView>
     );
   };
 
@@ -566,10 +557,7 @@ export default function HomeScreen() {
           activeOpacity={1}
           onPress={() => setShowYearPicker(false)}
         >
-          <Animated.View 
-            entering={FadeIn.duration(200)}
-            className="bg-white rounded-2xl w-72 max-h-96 overflow-hidden"
-          >
+          <View className="bg-white rounded-2xl w-72 max-h-96 overflow-hidden">
             <Text className="text-lg font-bold text-center py-4 border-b border-gray-100">Select Year</Text>
             <FlatList
               data={yearOptions}
@@ -587,7 +575,7 @@ export default function HomeScreen() {
               initialScrollIndex={Math.max(0, yearOptions.indexOf(currentYear) - 3)}
               getItemLayout={(_, index) => ({ length: 48, offset: 48 * index, index })}
             />
-          </Animated.View>
+          </View>
         </TouchableOpacity>
       </Modal>
     </View>
