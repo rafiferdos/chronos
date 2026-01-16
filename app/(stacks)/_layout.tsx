@@ -1,0 +1,20 @@
+import { Stack } from 'expo-router';
+
+export default function StacksLayout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+      }}>
+      <Stack.Screen name="schedule/[date]" />
+      <Stack.Screen
+        name="create-event"
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+        }}
+      />
+    </Stack>
+  );
+}
