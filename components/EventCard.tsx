@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Briefcase, HomeIcon } from 'lucide-react-native';
+import { Briefcase, Clock, HomeIcon } from 'lucide-react-native';
 import { Text, View } from 'react-native';
 
 interface EventCardProps {
@@ -32,6 +32,18 @@ export function EventCard({ title, time, status, variant, icon }: EventCardProps
           </View>
           <Text className="text-lg font-bold text-gray-900">{title}</Text>
         </View>
+        {/* status badge */}
+        <View className={cn('rounded-full px-3 py-1', isPink ? 'bg-[#FFE4E4]' : 'bg-[#EDE9FE]')}>
+          <Text className={cn('text-xs font-bold', isPink ? 'text-[#FF8A8A]' : 'text-[#8B5CF6]')}>
+            {status}
+          </Text>
+        </View>
+      </View>
+
+      {/* time row */}
+      <View className="flex-row items-center gap-2 pl-1 opacity-80">
+        <Clock size={16} color="gray" />
+        <Text className="font-medium text-gray-600">{time}</Text>
       </View>
     </View>
   );
