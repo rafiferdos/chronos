@@ -4,16 +4,21 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, LogOut } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LogoutScreen() {
   const router = useRouter();
+  const { signOut } = useAuth();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsSigningOut(true);
-    setTimeout(() => {
-      router.replace('/(auth)/login');
-    }, 800);
+    try {
+      await signOut();
+      // signOut already navigates to login page
+    } catch (error) {
+      setIsSigningOut(false);
+    }
   };
 
   return (
@@ -35,12 +40,16 @@ export default function LogoutScreen() {
             You can sign in again anytime to pick up where you left off.
           </Text>
 
-          <Button className="bg-[#5D4037] h-14 rounded-2xl w-full" onPress={handleLogout}>
+          <Button 
+            className="bg-[#5D4037] h-14 rounded-2xl w-full" 
+            onPress={handleLogout}
+            disabled={isSigningOut}
+          >
             <Text className="text-white font-bold text-lg">
               {isSigningOut ? 'Signing out...' : 'Log out'}
             </Text>
           </Button>
-          <TouchableOpacity onPress={() => router.back()} className="mt-4">
+          <TouchableOpacity onPress={() => router.back()} className="mt-4" disabled={isSigningOut}>
             <Text className="text-center text-gray-500">Cancel</Text>
           </TouchableOpacity>
         </View>

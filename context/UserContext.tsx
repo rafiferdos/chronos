@@ -20,26 +20,18 @@ export interface UserProfile {
 interface UserContextType {
   user: UserProfile | null;
   isLoading: boolean;
+  initializeUser: (email: string, name?: string) => Promise<void>;
   updateUser: (updates: Partial<UserProfile>) => Promise<void>;
   resetUser: () => Promise<void>;
+  clearUser: () => Promise<void>;
 }
 
 const STORAGE_KEY = 'chronos_user_profile';
 
-const DEFAULT_USER: UserProfile = {
-  id: 'user_1',
-  name: 'Emma Johnson',
-  email: 'emma.johnson@email.com',
-  relation: 'Mother',
-  phone: '+1 (555) 123-4567',
-  dateOfBirth: '1985-06-15',
-  bio: 'Busy mom of two, trying to keep everyone organized!',
-  avatarUrl: 'https://i.pravatar.cc/300',
-  address: '123 Family Lane, San Francisco, CA 94102',
-  emergencyContact: 'John Johnson',
-  emergencyPhone: '+1 (555) 987-6543',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+// Generate a random avatar URL
+const getRandomAvatar = () => {
+  const seed = Math.random().toString(36).substring(7);
+  return `https://i.pravatar.cc/300?u=${seed}`;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -55,19 +47,53 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
         if (stored) {
           setUser(JSON.parse(stored));
-        } else {
-          // Initialize with default user
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_USER));
-          setUser(DEFAULT_USER);
         }
       } catch (error) {
         console.error('Failed to load user', error);
-        setUser(DEFAULT_USER);
       } finally {
         setIsLoading(false);
       }
     };
     loadUser();
+  }, []);
+
+  // Initialize a new user profile (called during sign-up or sign-in)
+  const initializeUser = useCallback(async (email: string, name?: string) => {
+    // Check if user already exists with this email
+    const stored = await AsyncStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const existingUser = JSON.parse(stored) as UserProfile;
+      // If same email, just update the user state and return
+      if (existingUser.email === email) {
+        setUser(existingUser);
+        return;
+      }
+    }
+
+    // Create new user profile
+    const newUser: UserProfile = {
+      id: `user_${Date.now()}`,
+      name: name || email.split('@')[0], // Use name if provided, otherwise use email prefix
+      email: email,
+      relation: 'Family Member',
+      phone: '',
+      dateOfBirth: '',
+      bio: '',
+      avatarUrl: getRandomAvatar(),
+      address: '',
+      emergencyContact: '',
+      emergencyPhone: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
+      setUser(newUser);
+    } catch (error) {
+      console.error('Failed to initialize user', error);
+      throw error;
+    }
   }, []);
 
   const updateUser = useCallback(async (updates: Partial<UserProfile>) => {
@@ -89,16 +115,42 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   const resetUser = useCallback(async () => {
+    if (!user) return;
+    
+    // Reset to basic info keeping email and name
+    const resetUserData: UserProfile = {
+      ...user,
+      relation: 'Family Member',
+      phone: '',
+      dateOfBirth: '',
+      bio: '',
+      avatarUrl: getRandomAvatar(),
+      address: '',
+      emergencyContact: '',
+      emergencyPhone: '',
+      updatedAt: new Date().toISOString(),
+    };
+    
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_USER));
-      setUser(DEFAULT_USER);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(resetUserData));
+      setUser(resetUserData);
     } catch (error) {
       console.error('Failed to reset user', error);
+    }
+  }, [user]);
+
+  // Clear user completely (for logout)
+  const clearUser = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+      setUser(null);
+    } catch (error) {
+      console.error('Failed to clear user', error);
     }
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, isLoading, updateUser, resetUser }}>
+    <UserContext.Provider value={{ user, isLoading, initializeUser, updateUser, resetUser, clearUser }}>
       {children}
     </UserContext.Provider>
   );

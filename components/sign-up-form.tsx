@@ -9,19 +9,30 @@ import * as React from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 
 interface SignUpFormProps {
-  onSignUp?: () => void;
+  onSignUp?: (data: { name: string; email: string; password: string }) => void;
   onSignIn?: () => void;
 }
 
 export function SignUpForm({ onSignUp, onSignIn }: SignUpFormProps) {
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  
+  const emailInputRef = React.useRef<TextInput>(null);
   const passwordInputRef = React.useRef<TextInput>(null);
+
+  function onNameSubmitEditing() {
+    emailInputRef.current?.focus();
+  }
 
   function onEmailSubmitEditing() {
     passwordInputRef.current?.focus();
   }
 
   function onSubmit() {
-    onSignUp?.();
+    if (name.trim() && email.trim() && password.trim()) {
+      onSignUp?.({ name: name.trim(), email: email.trim(), password });
+    }
   }
 
   return (
@@ -36,13 +47,30 @@ export function SignUpForm({ onSignUp, onSignIn }: SignUpFormProps) {
         <CardContent className="gap-6">
           <View className="gap-6">
             <View className="gap-1.5">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                placeholder="John Doe"
+                autoCapitalize="words"
+                autoComplete="name"
+                value={name}
+                onChangeText={setName}
+                onSubmitEditing={onNameSubmitEditing}
+                returnKeyType="next"
+                submitBehavior="submit"
+              />
+            </View>
+            <View className="gap-1.5">
               <Label htmlFor="email">Email</Label>
               <Input
+                ref={emailInputRef}
                 id="email"
                 placeholder="m@example.com"
                 keyboardType="email-address"
                 autoComplete="email"
                 autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
                 onSubmitEditing={onEmailSubmitEditing}
                 returnKeyType="next"
                 submitBehavior="submit"
@@ -56,6 +84,8 @@ export function SignUpForm({ onSignUp, onSignIn }: SignUpFormProps) {
                 ref={passwordInputRef}
                 id="password"
                 secureTextEntry
+                value={password}
+                onChangeText={setPassword}
                 returnKeyType="send"
                 onSubmitEditing={onSubmit}
               />

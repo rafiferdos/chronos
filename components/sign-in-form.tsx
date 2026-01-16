@@ -16,12 +16,15 @@ import * as React from 'react';
 import { Pressable, type TextInput, View } from 'react-native';
 
 interface SignInFormProps {
-  onSignIn?: () => void;
+  onSignIn?: (data: { email: string; password: string }) => void;
   onSignUp?: () => void;
   onForgotPassword?: () => void;
 }
 
 export function SignInForm({ onSignIn, onSignUp, onForgotPassword }: SignInFormProps) {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  
   const passwordInputRef = React.useRef<TextInput>(null);
 
   function onEmailSubmitEditing() {
@@ -29,7 +32,9 @@ export function SignInForm({ onSignIn, onSignUp, onForgotPassword }: SignInFormP
   }
 
   function onSubmit() {
-    onSignIn?.();
+    if (email.trim() && password.trim()) {
+      onSignIn?.({ email: email.trim(), password });
+    }
   }
 
   return (
@@ -54,6 +59,8 @@ export function SignInForm({ onSignIn, onSignUp, onForgotPassword }: SignInFormP
                 keyboardType="email-address"
                 autoComplete="email"
                 autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
                 onSubmitEditing={onEmailSubmitEditing}
                 returnKeyType="next"
                 submitBehavior="submit"
@@ -74,6 +81,8 @@ export function SignInForm({ onSignIn, onSignUp, onForgotPassword }: SignInFormP
                 ref={passwordInputRef}
                 id="password"
                 secureTextEntry
+                value={password}
+                onChangeText={setPassword}
                 returnKeyType="send"
                 onSubmitEditing={onSubmit}
               />
