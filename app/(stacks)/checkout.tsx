@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, CreditCard, Check } from 'lucide-react-native';
+import { ArrowLeft, CreditCard, Check, Wallet } from 'lucide-react-native';
 import { Input } from '@/components/ui/input'; 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils'; 
@@ -11,6 +11,17 @@ export default function CheckoutScreen() {
   const router = useRouter();
   const [saveCard, setSaveCard] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState('visa');
+  const [addNewCard, setAddNewCard] = useState(false);
+
+  const paymentMethods = useMemo(
+    () => [
+      { id: 'visa', label: 'Visa', detail: '•••• 4242', expiry: '09/28' },
+      { id: 'mastercard', label: 'Mastercard', detail: '•••• 5512', expiry: '11/27' },
+      { id: 'paypal', label: 'PayPal', detail: 'emma@family.app', expiry: '' },
+    ],
+    []
+  );
 
   const handlePayment = () => {
     // Simulate API call
@@ -32,31 +43,84 @@ export default function CheckoutScreen() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4">
             <ArrowLeft size={24} color="black" />
           </TouchableOpacity>
-          {/* Empty title spacer if needed */}
+          <Text className="text-lg font-semibold text-black">Checkout</Text>
         </View>
 
         <ScrollView className="flex-1 px-6">
-          <Text className="text-2xl font-bold mb-6">Select your payment method</Text>
-
-          {/* Payment Method Pills */}
-          <View className="flex-row gap-3 mb-8 overflow-hidden">
-             {['Stripe', 'Visa', 'PayPal', 'Amex'].map((method, i) => (
-               <View key={i} className="bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
-                 {/* In a real app, use SVG Logos here */}
-                 <Text className="font-bold text-gray-700 text-xs">{method}</Text>
-               </View>
-             ))}
-             <TouchableOpacity className="bg-[#5D4037] px-4 py-3 rounded-xl justify-center">
-                <Text className="text-white text-xs font-bold">Add New +</Text>
-             </TouchableOpacity>
-          </View>
-
+          <Text className="text-2xl font-bold mb-2">Select payment method</Text>
           <Text className="text-gray-500 mb-6 text-sm">
-            Add your payment method to your Google Account to complete your purchase.
+            Choose a saved method or add a new card to continue.
           </Text>
 
+          <View className="gap-3 mb-8">
+            {paymentMethods.map((method) => {
+              const isSelected = selectedMethod === method.id && !addNewCard;
+              return (
+                <TouchableOpacity
+                  key={method.id}
+                  className={cn(
+                    'flex-row items-center justify-between rounded-2xl border p-4',
+                    isSelected ? 'border-[#5D4037] bg-[#F9F6F3]' : 'border-gray-100 bg-white'
+                  )}
+                  onPress={() => {
+                    setSelectedMethod(method.id);
+                    setAddNewCard(false);
+                  }}
+                  activeOpacity={0.9}
+                >
+                  <View className="flex-row items-center gap-3">
+                    <View className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center">
+                      <Wallet size={18} color="#5D4037" />
+                    </View>
+                    <View>
+                      <Text className="text-sm font-semibold text-gray-900">
+                        {method.label} {method.detail}
+                      </Text>
+                      {method.expiry ? (
+                        <Text className="text-xs text-gray-500">Expires {method.expiry}</Text>
+                      ) : (
+                        <Text className="text-xs text-gray-500">Connected</Text>
+                      )}
+                    </View>
+                  </View>
+                  {isSelected ? (
+                    <View className="h-6 w-6 rounded-full bg-[#5D4037] items-center justify-center">
+                      <Check size={14} color="white" />
+                    </View>
+                  ) : (
+                    <View className="h-6 w-6 rounded-full border border-gray-200" />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+
+            <TouchableOpacity
+              className={cn(
+                'flex-row items-center justify-between rounded-2xl border p-4',
+                addNewCard ? 'border-[#5D4037] bg-[#F9F6F3]' : 'border-gray-100 bg-white'
+              )}
+              onPress={() => setAddNewCard(true)}
+              activeOpacity={0.9}
+            >
+              <View className="flex-row items-center gap-3">
+                <View className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center">
+                  <CreditCard size={18} color="#5D4037" />
+                </View>
+                <Text className="text-sm font-semibold text-gray-900">Add new card</Text>
+              </View>
+              {addNewCard ? (
+                <View className="h-6 w-6 rounded-full bg-[#5D4037] items-center justify-center">
+                  <Check size={14} color="white" />
+                </View>
+              ) : (
+                <View className="h-6 w-6 rounded-full border border-gray-200" />
+              )}
+            </TouchableOpacity>
+          </View>
+
           {/* Form */}
-          <View className="gap-5">
+          {addNewCard ? (
+            <View className="gap-5">
             <View className="gap-2">
                <Text className="text-xs font-bold uppercase text-gray-400 tracking-wider">Card Holder Name</Text>
                <Input placeholder="Your full name" className="bg-gray-50 border-gray-100 h-14 rounded-xl" />
@@ -104,6 +168,14 @@ export default function CheckoutScreen() {
                <Text className="text-white font-bold text-lg">Proceed to confirm</Text>
             </Button>
           </View>
+          ) : (
+            <Button 
+              className="bg-[#5D4037] h-14 rounded-full mt-2 shadow-sm"
+              onPress={handlePayment}
+            >
+              <Text className="text-white font-bold text-lg">Pay with selected method</Text>
+            </Button>
+          )}
 
         </ScrollView>
       </SafeAreaView>
