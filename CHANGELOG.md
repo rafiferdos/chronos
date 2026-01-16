@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-01-16
+
+### Added
+
+- **Android APK Build**: First official APK release available for download
+- **EAS Build Configuration**: Added `eas.json` for build profiles (development, preview, production)
+- **Android Package ID**: Configured `com.rafiferdos.chronos` as the Android package identifier
+
+### Changed
+
+- All fixes and improvements from v1.0.1 included
+
 ## [1.0.1] - 2026-01-16
 
 ### Fixed
