@@ -24,6 +24,8 @@ export default function StacksLayout() {
       <Stack.Screen name="alert" />
       <Stack.Screen name="delete-account" />
       <Stack.Screen name="logout" />
+      <Stack.Screen name="group-members" />
+      <Stack.Screen name="send-invitation" />
     </Stack>
   );
 }
