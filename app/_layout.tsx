@@ -1,6 +1,7 @@
 import '@/global.css';
 
 import { AuthProvider } from '@/context/AuthContext';
+import { EventsProvider } from '@/context/EventsContext';
 import { NAV_THEME } from '@/lib/theme';
 import { toastConfig } from '@/lib/toast-config';
 import { ThemeProvider } from '@react-navigation/native';
@@ -21,6 +22,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
       <AuthProvider>
+        <EventsProvider>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <Stack
           screenOptions={{
@@ -38,8 +40,9 @@ export default function RootLayout() {
           {/* the onboarding flow */}
           <Stack.Screen name="(onboarding)" />
         </Stack>
-        <PortalHost />
-        <Toast config={toastConfig} position="top" topOffset={50} />
+          <PortalHost />
+          <Toast config={toastConfig} position="top" topOffset={50} />
+        </EventsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

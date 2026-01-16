@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Image, Switch, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { 
   Bell, 
-  User, 
   Edit3, 
   AlertCircle, 
   Lock, 
@@ -13,7 +13,9 @@ import {
   CreditCard, 
   Trash2, 
   LogOut,
-  ChevronLeft
+  ChevronLeft,
+  Crown,
+  Sparkles
 } from 'lucide-react-native';
 import { ProfileMenuItem } from '@/components/ProfileMenuItem'; 
 
@@ -21,11 +23,16 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
+  const groupMembersHref = '/(stacks)/group-members' as Href;
+  const alertHref = '/(stacks)/alert' as Href;
+  const deleteAccountHref = '/(stacks)/delete-account' as Href;
+  const logoutHref = '/(stacks)/logout' as Href;
+
   return (
     <View className="flex-1 bg-gray-50/50">
       <SafeAreaView edges={['top']} className="flex-1">
         
-        {/* 1. Header */}
+        {/* Header */}
         <View className="px-6 py-4 flex-row justify-between items-center">
           <TouchableOpacity onPress={() => router.back()}>
             <ChevronLeft size={24} color="black" />
@@ -38,10 +45,9 @@ export default function ProfileScreen() {
 
         <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
           
-          {/* 2. User Info Card */}
-          <View className="items-center mb-8 mt-4">
+          {/* User Info Card */}
+          <View className="items-center mb-6 mt-4">
             <View className="w-24 h-24 rounded-full bg-gray-200 mb-4 border-4 border-white shadow-sm overflow-hidden">
-               {/* Placeholder Image - Replace with real URI later */}
                <Image 
                  source={{ uri: 'https://i.pravatar.cc/300' }} 
                  className="w-full h-full"
@@ -51,7 +57,47 @@ export default function ProfileScreen() {
             <Text className="text-gray-500 text-sm">Mother</Text>
           </View>
 
-          {/* 3. General Settings Group */}
+          {/* Premium Upgrade Banner */}
+          <TouchableOpacity
+            className="mb-6 overflow-hidden rounded-2xl"
+            onPress={() => router.push('/(stacks)/payment')}
+            activeOpacity={0.9}
+          >
+            <LinearGradient
+              colors={['#5D4037', '#8B6914', '#D4A853']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className="p-5"
+            >
+              <View className="flex-row items-center justify-between">
+                <View className="flex-1">
+                  <View className="flex-row items-center gap-2 mb-1">
+                    <Crown size={20} color="#FFD700" />
+                    <Text className="text-white font-bold text-lg">Upgrade to Premium</Text>
+                  </View>
+                  <Text className="text-white/80 text-sm">
+                    Unlock unlimited features & priority support
+                  </Text>
+                </View>
+                <View className="bg-white/20 rounded-full p-3">
+                  <Sparkles size={24} color="#FFD700" />
+                </View>
+              </View>
+              <View className="flex-row items-center gap-2 mt-4">
+                <View className="bg-white/20 rounded-full px-3 py-1">
+                  <Text className="text-white text-xs font-medium">Ad-Free</Text>
+                </View>
+                <View className="bg-white/20 rounded-full px-3 py-1">
+                  <Text className="text-white text-xs font-medium">Unlimited Members</Text>
+                </View>
+                <View className="bg-white/20 rounded-full px-3 py-1">
+                  <Text className="text-white text-xs font-medium">Analytics</Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* General Settings Group */}
           <View className="bg-white rounded-2xl p-4 mb-6 shadow-sm shadow-gray-100">
             <ProfileMenuItem 
               icon={<Edit3 size={20} color="#5D4037" />} 
@@ -61,13 +107,12 @@ export default function ProfileScreen() {
             <ProfileMenuItem 
               icon={<AlertCircle size={20} color="#5D4037" />} 
               label="Alert" 
-              onPress={() => router.push('/(stacks)/alert')}
+              onPress={() => router.push(alertHref)}
             />
             <ProfileMenuItem 
               icon={<Bell size={20} color="#5D4037" />} 
               label="Notification" 
               hasBorder={false}
-              // Custom Switch element overrides the chevron
               rightElement={
                 <Switch 
                   value={notificationsEnabled}
@@ -79,7 +124,7 @@ export default function ProfileScreen() {
             />
           </View>
 
-          {/* 4. Privacy & Security Group */}
+          {/* Privacy & Security Group */}
           <Text className="text-gray-500 font-bold mb-3 ml-2 text-xs uppercase tracking-wider">
             Privacy & Security
           </Text>
@@ -102,7 +147,7 @@ export default function ProfileScreen() {
             />
           </View>
 
-          {/* 5. App Settings Group */}
+          {/* App Settings Group */}
           <Text className="text-gray-500 font-bold mb-3 ml-2 text-xs uppercase tracking-wider">
             App
           </Text>
@@ -110,7 +155,7 @@ export default function ProfileScreen() {
             <ProfileMenuItem 
               icon={<Users size={20} color="#5D4037" />} 
               label="Group Members" 
-              onPress={() => {}}
+              onPress={() => router.push(groupMembersHref)}
             />
             <ProfileMenuItem 
               icon={<CreditCard size={20} color="#5D4037" />} 
@@ -120,14 +165,14 @@ export default function ProfileScreen() {
             <ProfileMenuItem 
               icon={<Trash2 size={20} color="#5D4037" />} 
               label="Delete Account" 
-              onPress={() => router.push('/(stacks)/delete-account')}
+              onPress={() => router.push(deleteAccountHref)}
             />
             <ProfileMenuItem 
               icon={<LogOut size={20} color="#EF4444" />} 
               label="Log Out" 
               isDestructive
               hasBorder={false}
-              onPress={() => router.push('/(stacks)/logout')}
+              onPress={() => router.push(logoutHref)}
             />
           </View>
 
