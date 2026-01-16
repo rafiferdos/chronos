@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { ONBOARDING_SLIDES, OnBoardingSlide } from '@/lib/constants/onboarding';
+import { markOnboardingCompleted } from '@/components/VideoSplash';
 import { useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { FlatList, TouchableOpacity, useWindowDimensions, View, ViewToken } from 'react-native';
@@ -26,16 +27,22 @@ export default function OnBoardingScreen() {
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
+  const handleComplete = async () => {
+    // Mark onboarding as completed so video won't show again
+    await markOnboardingCompleted();
+    router.replace('/(auth)/login');
+  };
+
   const handleNext = () => {
     const nextIndex = activeIndex + 1;
     if (nextIndex < ONBOARDING_SLIDES.length) {
       flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
     } else {
-      router.replace('/(auth)/login');
+      handleComplete();
     }
   };
 
-  const handleSkip = () => router.replace('/(auth)/login');
+  const handleSkip = () => handleComplete();
 
   const renderItem = useCallback(
     ({ item }: { item: OnBoardingSlide }) => (

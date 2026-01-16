@@ -23,13 +23,19 @@ export default function RootLayout() {
   const { colorScheme } = useColorScheme();
   const [showSplash, setShowSplash] = useState(true);
 
+  // Called when video finishes for new users - proceed to onboarding
   const handleSplashFinish = useCallback(() => {
     setShowSplash(false);
   }, []);
 
-  // Show video splash screen first
+  // Called when returning users skip the video - proceed directly to main app
+  const handleSplashSkip = useCallback(() => {
+    setShowSplash(false);
+  }, []);
+
+  // Show video splash screen for new users only
   if (showSplash) {
-    return <VideoSplash onFinish={handleSplashFinish} />;
+    return <VideoSplash onFinish={handleSplashFinish} onSkip={handleSplashSkip} />;
   }
 
   return (
