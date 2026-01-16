@@ -23,7 +23,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { getDatesWithEvents, getEventsByDate } = useEvents();
+  const { events, getDatesWithEvents, getEventsByDate } = useEvents();
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
@@ -110,6 +110,16 @@ export default function HomeScreen() {
     return { prev: goToPreviousMonth, next: goToNextMonth };
   }, [viewMode, goToPreviousMonth, goToNextMonth, goToPreviousWeek, goToNextWeek, goToPreviousDay, goToNextDay]);
 
+  const getEventColor = (color?: string) => {
+    switch (color) {
+      case 'red': return { bg: 'bg-red-100', text: 'text-red-600', border: 'border-red-300' };
+      case 'blue': return { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-300' };
+      case 'green': return { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-300' };
+      case 'purple': return { bg: 'bg-purple-100', text: 'text-purple-600', border: 'border-purple-300' };
+      default: return { bg: 'bg-[#F9F6F3]', text: 'text-[#5D4037]', border: 'border-[#D4C4B5]' };
+    }
+  };
+
   const renderMonthView = () => {
     const weeks: (Date | null)[][] = [];
     for (let i = 0; i < calendarDays.length; i += 7) {
@@ -120,12 +130,12 @@ export default function HomeScreen() {
       <Animated.View 
         entering={FadeIn.duration(300)} 
         exiting={FadeOut.duration(200)}
-        className="flex-1 px-4"
+        className="flex-1 px-2"
       >
         {/* Weekday headers */}
-        <View className="flex-row mb-2">
+        <View className="flex-row mb-1">
           {WEEKDAYS.map((day) => (
-            <View key={day} className="flex-1 items-center py-2">
+            <View key={day} className="flex-1 items-center py-1">
               <Text className="text-gray-400 text-xs font-medium uppercase">{day}</Text>
             </View>
           ))}
@@ -147,32 +157,37 @@ export default function HomeScreen() {
                 return (
                   <TouchableOpacity
                     key={dateString}
-                    className="flex-1 border-t border-gray-100 p-1"
+                    className="flex-1 border-t border-gray-100 px-0.5 py-1"
                     onPress={() => handleDayPress(day)}
                     activeOpacity={0.7}
                   >
-                    <View className={`w-7 h-7 rounded-full items-center justify-center self-center ${isCurrentDay ? 'bg-[#5D4037]' : ''}`}>
-                      <Text className={`text-sm font-semibold ${isCurrentDay ? 'text-white' : 'text-gray-800'}`}>
+                    <View className={`w-6 h-6 rounded-full items-center justify-center self-center ${isCurrentDay ? 'bg-[#5D4037]' : ''}`}>
+                      <Text className={`text-xs font-semibold ${isCurrentDay ? 'text-white' : 'text-gray-800'}`}>
                         {format(day, 'd')}
                       </Text>
                     </View>
                     
+                    {/* Event titles */}
                     {dayEvents.length > 0 && (
-                      <View className="mt-1 gap-0.5">
-                        {dayEvents.slice(0, 2).map((event) => (
-                          <View
-                            key={event.id}
-                            className={`h-1.5 rounded-full mx-0.5 ${
-                              event.color === 'red' ? 'bg-red-400' :
-                              event.color === 'purple' ? 'bg-purple-400' :
-                              event.color === 'blue' ? 'bg-blue-400' :
-                              event.color === 'green' ? 'bg-green-400' :
-                              'bg-[#5D4037]'
-                            }`}
-                          />
-                        ))}
+                      <View className="mt-0.5 gap-0.5">
+                        {dayEvents.slice(0, 2).map((event) => {
+                          const colors = getEventColor(event.color);
+                          return (
+                            <View
+                              key={event.id}
+                              className={`px-1 py-0.5 rounded ${colors.bg}`}
+                            >
+                              <Text 
+                                className={`text-[8px] font-medium ${colors.text}`}
+                                numberOfLines={1}
+                              >
+                                {event.title}
+                              </Text>
+                            </View>
+                          );
+                        })}
                         {dayEvents.length > 2 && (
-                          <Text className="text-[8px] text-gray-400 text-center">+{dayEvents.length - 2}</Text>
+                          <Text className="text-[8px] text-gray-400 text-center">+{dayEvents.length - 2} more</Text>
                         )}
                       </View>
                     )}
@@ -188,6 +203,15 @@ export default function HomeScreen() {
 
   const renderYearView = () => {
     const months = Array.from({ length: 12 }, (_, i) => i);
+    
+    // Get unique event colors for each month
+    const getMonthEventColors = (year: number, month: number) => {
+      const monthStr = `${year}-${String(month).padStart(2, '0')}`;
+      const monthEvents = events.filter(e => e.date.startsWith(monthStr));
+      const colors = new Set(monthEvents.map(e => e.color || 'default'));
+      return Array.from(colors).slice(0, 4); // Max 4 color indicators
+    };
+
     return (
       <Animated.ScrollView 
         entering={FadeIn.duration(300)} 
@@ -198,7 +222,9 @@ export default function HomeScreen() {
         <View className="flex-row flex-wrap py-2">
           {months.map((month) => {
             const monthDate = new Date(currentYear, month, 1);
-            const monthEvents = getDatesWithEvents(currentYear, month + 1);
+            const monthEventColors = getMonthEventColors(currentYear, month + 1);
+            const hasEvents = monthEventColors.length > 0;
+            
             return (
               <AnimatedPressable
                 key={month}
@@ -209,11 +235,24 @@ export default function HomeScreen() {
                   setViewMode('month');
                 }}
               >
-                <View className="bg-gray-50 rounded-xl p-4 items-center">
-                  <Text className="font-semibold text-gray-800 text-base">{format(monthDate, 'MMM')}</Text>
-                  {monthEvents.size > 0 && (
+                <View className={`rounded-xl p-4 items-center ${hasEvents ? 'bg-[#F9F6F3] border border-[#E8DDD4]' : 'bg-gray-50'}`}>
+                  <Text className={`font-semibold text-base ${hasEvents ? 'text-[#5D4037]' : 'text-gray-800'}`}>
+                    {format(monthDate, 'MMM')}
+                  </Text>
+                  {hasEvents && (
                     <View className="flex-row gap-1 mt-2">
-                      <View className="w-2 h-2 rounded-full bg-[#5D4037]" />
+                      {monthEventColors.map((color, idx) => (
+                        <View 
+                          key={idx}
+                          className={`w-2 h-2 rounded-full ${
+                            color === 'red' ? 'bg-red-400' :
+                            color === 'blue' ? 'bg-blue-400' :
+                            color === 'green' ? 'bg-green-400' :
+                            color === 'purple' ? 'bg-purple-400' :
+                            'bg-[#5D4037]'
+                          }`}
+                        />
+                      ))}
                     </View>
                   )}
                 </View>
