@@ -1,5 +1,6 @@
 import '@/global.css';
 
+import { useState, useCallback } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { EventsProvider } from '@/context/EventsContext';
 import { UserProvider } from '@/context/UserContext';
@@ -11,6 +12,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import Toast from 'react-native-toast-message';
+import { VideoSplash } from '@/components/VideoSplash';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -19,6 +21,16 @@ export {
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
+  const [showSplash, setShowSplash] = useState(true);
+
+  const handleSplashFinish = useCallback(() => {
+    setShowSplash(false);
+  }, []);
+
+  // Show video splash screen first
+  if (showSplash) {
+    return <VideoSplash onFinish={handleSplashFinish} />;
+  }
 
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
