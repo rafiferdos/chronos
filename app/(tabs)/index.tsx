@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { CalendarList } from 'react-native-calendars'; // CalendarList scrolls vertically like Google Cal
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,12 +23,20 @@ export default function HomeScreen() {
             <Text className="text-3xl font-bold text-[#5D4037]">Hello!</Text>
             <Text className="text-gray-400 text-base">Good morning, Emma!</Text>
           </View>
-          <TouchableOpacity
-            className="w-10 h-10 bg-gray-50 rounded-full justify-center items-center"
-            onPress={() => router.push('/(stacks)/notifications')}
-          >
-            <Bell size={20} color="black" />
-          </TouchableOpacity>
+          <View className="flex-row items-center gap-3">
+            <TouchableOpacity
+              className="w-10 h-10 bg-gray-50 rounded-full justify-center items-center"
+              onPress={() => router.push('/(stacks)/notifications')}
+            >
+              <Bell size={20} color="black" />
+            </TouchableOpacity>
+            <View className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-gray-100">
+              <Image
+                source={{ uri: 'https://i.pravatar.cc/120' }}
+                className="w-full h-full"
+              />
+            </View>
+          </View>
         </View>
 
         {/* Full Screen Calendar */}

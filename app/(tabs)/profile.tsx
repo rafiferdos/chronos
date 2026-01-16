@@ -61,7 +61,7 @@ export default function ProfileScreen() {
             <ProfileMenuItem 
               icon={<AlertCircle size={20} color="#5D4037" />} 
               label="Alert" 
-              onPress={() => {}}
+              onPress={() => router.push('/(stacks)/alert')}
             />
             <ProfileMenuItem 
               icon={<Bell size={20} color="#5D4037" />} 
@@ -120,14 +120,14 @@ export default function ProfileScreen() {
             <ProfileMenuItem 
               icon={<Trash2 size={20} color="#5D4037" />} 
               label="Delete Account" 
-              onPress={() => {}}
+              onPress={() => router.push('/(stacks)/delete-account')}
             />
             <ProfileMenuItem 
               icon={<LogOut size={20} color="#EF4444" />} 
               label="Log Out" 
               isDestructive
               hasBorder={false}
-              onPress={() => router.replace('/(auth)/login')}
+              onPress={() => router.push('/(stacks)/logout')}
             />
           </View>
 

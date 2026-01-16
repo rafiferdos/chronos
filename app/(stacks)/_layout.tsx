@@ -21,6 +21,9 @@ export default function StacksLayout() {
       <Stack.Screen name="privacy" />
       <Stack.Screen name="terms" />
       <Stack.Screen name="notifications" />
+      <Stack.Screen name="alert" />
+      <Stack.Screen name="delete-account" />
+      <Stack.Screen name="logout" />
     </Stack>
   );
 }
