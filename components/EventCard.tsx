@@ -6,12 +6,14 @@ interface EventCardProps {
   title: string;
   time: string;
   status: 'Pending' | 'Upcoming';
-  variant: 'pink' | 'purple';
+  themeColor?: 'red' | 'purple';
+  variant?: 'pink' | 'purple';
   icon?: 'work' | 'home';
 }
 
-export function EventCard({ title, time, status, variant, icon }: EventCardProps) {
-  const isPink = variant === 'pink';
+export function EventCard({ title, time, status, themeColor, variant, icon }: EventCardProps) {
+  const resolvedTheme = themeColor ?? (variant === 'pink' ? 'red' : 'purple');
+  const isPink = resolvedTheme === 'red';
 
   return (
     <View
