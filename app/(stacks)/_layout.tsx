@@ -15,6 +15,9 @@ export default function StacksLayout() {
           animation: 'slide_from_bottom',
         }}
       />
+      <Stack.Screen name="edit-profile" />
+      <Stack.Screen name="payment" />
+      <Stack.Screen name="privacy" />
     </Stack>
   );
 }
