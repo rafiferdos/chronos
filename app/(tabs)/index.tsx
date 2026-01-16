@@ -23,7 +23,10 @@ export default function HomeScreen() {
             <Text className="text-3xl font-bold text-[#5D4037]">Hello!</Text>
             <Text className="text-gray-400 text-base">Good morning, Emma!</Text>
           </View>
-          <TouchableOpacity className="w-10 h-10 bg-gray-50 rounded-full justify-center items-center">
+          <TouchableOpacity
+            className="w-10 h-10 bg-gray-50 rounded-full justify-center items-center"
+            onPress={() => router.push('/(stacks)/notifications')}
+          >
             <Bell size={20} color="black" />
           </TouchableOpacity>
         </View>

@@ -20,6 +20,7 @@ export default function StacksLayout() {
       <Stack.Screen name="checkout" />
       <Stack.Screen name="privacy" />
       <Stack.Screen name="terms" />
+      <Stack.Screen name="notifications" />
     </Stack>
   );
 }

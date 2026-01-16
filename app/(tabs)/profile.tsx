@@ -31,7 +31,7 @@ export default function ProfileScreen() {
             <ChevronLeft size={24} color="black" />
           </TouchableOpacity>
           <Text className="text-xl font-bold text-black">Profile</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/(stacks)/notifications')}>
              <Bell size={24} color="black" />
           </TouchableOpacity>
         </View>
@@ -98,7 +98,7 @@ export default function ProfileScreen() {
               icon={<FileText size={20} color="#5D4037" />} 
               label="Terms & Condition" 
               hasBorder={false}
-              onPress={() => {}}
+              onPress={() => router.push('/(stacks)/terms')}
             />
           </View>
 
