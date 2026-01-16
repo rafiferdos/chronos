@@ -40,7 +40,8 @@
           "image": "./assets/images/splash.png",
           "imageWidth": 200
         }
-      ]
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true
