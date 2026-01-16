@@ -2,7 +2,7 @@
   "expo": {
     "name": "chronos",
     "slug": "chronos",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "chronos",
@@ -20,6 +20,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.rafiferdos.chronos",
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -45,6 +46,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7ab4d713-7e54-43e2-b756-212632851ab0"
+      }
+    },
+    "owner": "rafiferdos"
   }
 }
