@@ -25,8 +25,19 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
-          }}
-        />
+          }}>
+          {/* the tab bar (home calendar, profile) */}
+          <Stack.Screen name="(tabs)" />
+
+          {/* the stack screens (schedule, details, payments) */}
+          <Stack.Screen name="(stacks)" />
+
+          {/* the auth flow (login, signup) */}
+          <Stack.Screen name="(auth)" />
+
+          {/* the onboarding flow */}
+          <Stack.Screen name="(onboarding)" />
+        </Stack>
         <PortalHost />
         <Toast config={toastConfig} position="top" topOffset={50} />
       </AuthProvider>
