@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, Switch, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,18 +15,31 @@ import {
   LogOut,
   ChevronLeft,
   Crown,
-  Sparkles
+  Sparkles,
+  Mail,
+  Phone,
+  MapPin
 } from 'lucide-react-native';
-import { ProfileMenuItem } from '@/components/ProfileMenuItem'; 
+import { ProfileMenuItem } from '@/components/ProfileMenuItem';
+import { useUser } from '@/context/UserContext';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { user, isLoading } = useUser();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   const groupMembersHref = '/(stacks)/group-members' as Href;
   const alertHref = '/(stacks)/alert' as Href;
   const deleteAccountHref = '/(stacks)/delete-account' as Href;
   const logoutHref = '/(stacks)/logout' as Href;
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-gray-50/50 items-center justify-center">
+        <ActivityIndicator size="large" color="#5D4037" />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-gray-50/50">
@@ -46,16 +59,35 @@ export default function ProfileScreen() {
         <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
           
           {/* User Info Card */}
-          <View className="items-center mb-6 mt-4">
+          <View className="items-center mb-4 mt-4">
             <View className="w-24 h-24 rounded-full bg-gray-200 mb-4 border-4 border-white shadow-sm overflow-hidden">
                <Image 
-                 source={{ uri: 'https://i.pravatar.cc/300' }} 
+                 source={{ uri: user?.avatarUrl || 'https://i.pravatar.cc/300' }} 
                  className="w-full h-full"
                />
             </View>
-            <Text className="text-xl font-bold text-gray-900">Emma Johnson</Text>
-            <Text className="text-gray-500 text-sm">Mother</Text>
+            <Text className="text-xl font-bold text-gray-900">{user?.name || 'User'}</Text>
+            <Text className="text-gray-500 text-sm">{user?.relation || 'Family Member'}</Text>
+            
+            {/* Quick Info */}
+            {(user?.email || user?.phone) && (
+              <View className="flex-row items-center gap-4 mt-3">
+                {user?.email && (
+                  <View className="flex-row items-center gap-1">
+                    <Mail size={12} color="#9CA3AF" />
+                    <Text className="text-gray-400 text-xs">{user.email}</Text>
+                  </View>
+                )}
+              </View>
+            )}
           </View>
+          
+          {/* Bio Card */}
+          {user?.bio && (
+            <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm shadow-gray-100">
+              <Text className="text-gray-600 text-sm text-center italic">"{user.bio}"</Text>
+            </View>
+          )}
 
           {/* Premium Upgrade Banner */}
           <TouchableOpacity

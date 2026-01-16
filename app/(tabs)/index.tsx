@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react-native';
 import { useEvents } from '@/context/EventsContext';
+import { useUser } from '@/context/UserContext';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, startOfWeek, addDays } from 'date-fns';
 import Animated, { FadeIn, FadeOut, SlideInRight, SlideOutLeft, Layout } from 'react-native-reanimated';
 
@@ -24,6 +25,20 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export default function HomeScreen() {
   const router = useRouter();
   const { events, getDatesWithEvents, getEventsByDate } = useEvents();
+  const { user } = useUser();
+
+  // Get greeting based on time of day
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }, []);
+
+  const firstName = useMemo(() => {
+    if (!user?.name) return 'there';
+    return user.name.split(' ')[0];
+  }, [user?.name]);
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
@@ -465,7 +480,7 @@ export default function HomeScreen() {
         <View className="px-5 py-3 flex-row justify-between items-center bg-white">
           <View>
             <Text className="text-2xl font-bold text-[#5D4037]">Hello!</Text>
-            <Text className="text-gray-400 text-sm">Good morning, Emma!</Text>
+            <Text className="text-gray-400 text-sm">{greeting}, {firstName}!</Text>
           </View>
           <View className="flex-row items-center gap-3">
             <TouchableOpacity
@@ -476,7 +491,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
             <View className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-gray-100">
               <Image
-                source={{ uri: 'https://i.pravatar.cc/120' }}
+                source={{ uri: user?.avatarUrl || 'https://i.pravatar.cc/120' }}
                 className="w-full h-full"
               />
             </View>

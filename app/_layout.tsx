@@ -2,6 +2,7 @@ import '@/global.css';
 
 import { AuthProvider } from '@/context/AuthContext';
 import { EventsProvider } from '@/context/EventsContext';
+import { UserProvider } from '@/context/UserContext';
 import { NAV_THEME } from '@/lib/theme';
 import { toastConfig } from '@/lib/toast-config';
 import { ThemeProvider } from '@react-navigation/native';
@@ -22,27 +23,29 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
       <AuthProvider>
-        <EventsProvider>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}>
-          {/* the tab bar (home calendar, profile) */}
-          <Stack.Screen name="(tabs)" />
+        <UserProvider>
+          <EventsProvider>
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}>
+              {/* the tab bar (home calendar, profile) */}
+              <Stack.Screen name="(tabs)" />
 
-          {/* the stack screens (schedule, details, payments) */}
-          <Stack.Screen name="(stacks)" />
+              {/* the stack screens (schedule, details, payments) */}
+              <Stack.Screen name="(stacks)" />
 
-          {/* the auth flow (login, signup) */}
-          <Stack.Screen name="(auth)" />
+              {/* the auth flow (login, signup) */}
+              <Stack.Screen name="(auth)" />
 
-          {/* the onboarding flow */}
-          <Stack.Screen name="(onboarding)" />
-        </Stack>
-          <PortalHost />
-          <Toast config={toastConfig} position="top" topOffset={50} />
-        </EventsProvider>
+              {/* the onboarding flow */}
+              <Stack.Screen name="(onboarding)" />
+            </Stack>
+            <PortalHost />
+            <Toast config={toastConfig} position="top" topOffset={50} />
+          </EventsProvider>
+        </UserProvider>
       </AuthProvider>
     </ThemeProvider>
   );
