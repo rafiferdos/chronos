@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { SubscriptionCard } from '@/components/SubscriptionCard';
+import PaymentGateway from '@/assets/images/payment-gateway.svg';
 
 export default function SubscriptionScreen() {
   const router = useRouter();
@@ -30,9 +31,8 @@ export default function SubscriptionScreen() {
           
           {/* Illustration Section */}
           <View className="items-center mt-4 mb-8">
-            {/* Placeholder for the vector art in your design */}
-            <View className="w-40 h-40 bg-gray-200 rounded-full mb-4 items-center justify-center">
-               <Text className="text-gray-400 text-xs text-center">Illustration{"\n"}Placeholder</Text>
+            <View className="w-56 h-56 items-center justify-center mb-4">
+              <PaymentGateway width="100%" height="100%" preserveAspectRatio="xMidYMid meet" />
             </View>
             <Text className="text-2xl font-bold text-center text-black mb-2">
               Upgrade to Premium
