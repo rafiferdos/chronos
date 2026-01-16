@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         text2: `Signed in as ${email}`,
       });
       
-      router.replace('/home');
+      router.replace('/(tabs)');
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         text2: 'Welcome to Chronos',
       });
       
-      router.replace('/home');
+      router.replace('/(tabs)');
     } catch (error) {
       Toast.show({
         type: 'error',
