@@ -1,9 +1,8 @@
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, router } from 'expo-router';
 import { Calendar, Plus, User } from 'lucide-react-native';
 import { Platform, TouchableOpacity, View } from 'react-native';
 
 export default function TabLayout() {
-  const router = useRouter();
 
   return (
     <Tabs

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, Modal, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react-native';
 import { useEvents } from '@/context/EventsContext';
@@ -20,7 +20,6 @@ const VIEW_TABS: { id: ViewMode; label: string }[] = [
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export default function HomeScreen() {
-  const router = useRouter();
   const { events, getDatesWithEvents, getEventsByDate } = useEvents();
   const { user } = useUser();
 
